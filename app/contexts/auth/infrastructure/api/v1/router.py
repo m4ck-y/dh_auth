@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Depends, Response, Cookie, status
+from fastapi import APIRouter, Depends, Response, Cookie, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
 
-from app.contexts.auth.application.dtos.auth_dto import LoginRequestDTO, LoginResponseDTO
+from app.contexts.auth.application.dtos.auth_dto import LoginRequestDTO, LoginResponseDTO, MeResponseDTO
 from app.contexts.auth.application.use_cases.login_use_case import LoginUseCase
 from app.contexts.auth.application.use_cases.refresh_token_use_case import RefreshTokenUseCase
+from app.contexts.auth.application.use_cases.get_me_use_case import GetMeUseCase
 from app.shared.database.postgres import AsyncSessionLocal
+from app.shared.utils.security import decode_access_token
 from app.settings.config import settings
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -73,3 +75,28 @@ async def logout(response: Response):
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
     return {"message": "Session closed"}
+
+@router.get("/me", response_model=MeResponseDTO)
+async def get_me(
+    access_token: Optional[str] = Cookie(None),
+    db: AsyncSession = Depends(get_db)
+):
+    if not access_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated"
+        )
+    
+    try:
+        payload = decode_access_token(access_token)
+        user_uuid = payload.get("sub")
+        roles = payload.get("roles", [])
+        permissions = payload.get("permissions", [])
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(e)
+        )
+    
+    use_case = GetMeUseCase(db)
+    return await use_case.execute(user_uuid, roles, permissions)

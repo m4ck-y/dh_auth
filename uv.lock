@@ -221,6 +221,7 @@ version = "0.1.0"
 source = { editable = "../dh_shared" }
 dependencies = [
     { name = "asyncpg" },
+    { name = "pwdlib", extra = ["argon2"] },
     { name = "pydantic" },
     { name = "sqlalchemy", extra = ["asyncio"] },
 ]
@@ -228,6 +229,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "asyncpg", specifier = ">=0.31.0" },
+    { name = "pwdlib", extras = ["argon2"], specifier = ">=0.3.0" },
     { name = "pydantic", specifier = ">=2.13.3" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.49" },
 ]

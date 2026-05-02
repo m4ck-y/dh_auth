@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DH Auth - Test Page</title>
+</head>
+<body>
+    <h1>Digital Hospital - Auth Service</h1>
+    <hr>
+
+    <div id="login-container">
+        <h3>Login</h3>
+        <input type="text" id="username" placeholder="Username / Email / Phone">
+        <br><br>
+        <input type="password" id="password" placeholder="Password">
+        <br><br>
+        <button id="login-btn">Login</button>
+    </div>
+
+    <div id="auth-container" style="display: none;">
+        <h3>Session Active</h3>
+        <p>You are authenticated via HttpOnly cookies.</p>
+        
+        <div id="profile-container" style="background: #f0f0f0; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+            <h4>Your Profile (/me)</h4>
+            <pre id="profile-data">Loading profile...</pre>
+        </div>
+
+        <button id="logout-btn">Logout</button>
+    </div>
+
+    <p id="message" style="color: red;"></p>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
