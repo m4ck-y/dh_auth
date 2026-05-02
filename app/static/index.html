@@ -3,85 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DH Auth - Test Page</title>
+<title>DH Auth - Terminal v1.0</title>
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
 
-<h1>Digital Hospital -- Auth Service</h1>
-<hr>
+<h1>DIGITAL HOSPITAL // AUTH SERVICE <span class="cursor"></span></h1>
 
-<div id="login-panel" style="display:block">
+<div id="login-panel" class="panel" style="display:block">
 
-<h2>Login</h2>
+<h2>> LOGIN</h2>
 <form id="login-form" onsubmit="return false">
     <table>
         <tr>
-            <td><label for="username"><b>Username / Email / Phone:</b></label></td>
+            <td><b>USERNAME:</b></td>
             <td><input type="text" id="username" name="username" placeholder="user@example.com" size="30"></td>
         </tr>
         <tr>
-            <td><label for="password"><b>Password:</b></label></td>
-            <td><input type="password" id="password" name="password" placeholder="password" size="30"></td>
+            <td><b>PASSWORD:</b></td>
+            <td><input type="password" id="password" name="password" placeholder="********" size="30"></td>
         </tr>
         <tr>
             <td></td>
-            <td><button type="submit" id="login-btn">Login</button></td>
+            <td><button type="submit" id="login-btn">[ LOGIN ]</button></td>
         </tr>
     </table>
 </form>
 
-<p><i>Enter your credentials above to start a session.</i></p>
+<p>$ Enter your credentials to initialize session.</p>
 </div>
 
-<div id="session-panel" style="display:none">
+<div id="session-panel" class="panel" style="display:none">
 
-<h2>Session Active</h2>
+<h2>> SESSION ACTIVE</h2>
 
 <table>
     <tr>
-        <td><b>Status:</b></td>
-        <td><font color="green">Authenticated via HttpOnly cookies</font></td>
+        <td><b>STATUS:</b></td>
+        <td><font color="#00ff88">Authenticated (HttpOnly cookies)</font></td>
     </tr>
     <tr>
-        <td><b>Access token:</b></td>
-        <td><tt>HttpOnly, short-lived JWT (15 min)</tt></td>
+        <td><b>ACCESS TOKEN:</b></td>
+        <td><tt>JWT | HttpOnly | 15 min TTL</tt></td>
     </tr>
     <tr>
-        <td><b>Refresh token:</b></td>
-        <td><tt>HttpOnly, persistent (30 days)</tt></td>
+        <td><b>REFRESH TOKEN:</b></td>
+        <td><tt>Random | HttpOnly | 30 day TTL</tt></td>
     </tr>
 </table>
 
-<h3>Profile (<tt>GET /v1/auth/me</tt>)</h3>
-<pre id="profile-data" style="border:1px solid #ccc; padding:12px; background:#f8f8f8; font-size:13px;">
+<h3>> PROFILE (GET /v1/auth/me)</h3>
+<pre id="profile-data">
 Loading profile...
 </pre>
 
 <br>
-<button id="refresh-profile-btn">Refresh Profile</button>
+<button id="refresh-profile-btn">[ REFRESH ]</button>
 &nbsp;&nbsp;
-<button id="logout-btn">Logout</button>
+<button id="logout-btn">[ LOGOUT ]</button>
 </div>
 
 <br>
 <hr>
 
-<h3>API Reference</h3>
+<h3>> API_REFERENCE</h3>
 <ul>
-    <li><a href="/docs" target="_blank">Swagger UI (/docs)</a></li>
-    <li><a href="/redoc" target="_blank">ReDoc (/redoc)</a></li>
-    <li><a href="/openapi.json" target="_blank">openapi.json</a></li>
+    <li><a href="/docs" target="_blank">/docs &lt;Swagger UI&gt;</a></li>
+    <li><a href="/redoc" target="_blank">/redoc &lt;ReDoc&gt;</a></li>
+    <li><a href="/openapi.json" target="_blank">/openapi.json &lt;raw spec&gt;</a></li>
 </ul>
 
-<h3>Authentication Flow</h3>
+<h3>> AUTH_FLOW</h3>
 <ol>
-    <li><b>POST /v1/auth/login</b> -- Send credentials, receive HttpOnly cookies.</li>
-    <li><b>GET /v1/auth/me</b> -- Read access_token cookie, return user profile.</li>
-    <li><b>POST /v1/auth/refresh</b> -- Read refresh_token cookie, renew access_token.</li>
-    <li><b>POST /v1/auth/logout</b> -- Clear both cookies.</li>
+    <li><b>POST /v1/auth/login</b> -- send credentials, receive HttpOnly cookies.</li>
+    <li><b>GET /v1/auth/me</b> -- read access_token cookie, return profile.</li>
+    <li><b>POST /v1/auth/refresh</b> -- read refresh_token cookie, renew access_token.</li>
+    <li><b>POST /v1/auth/logout</b> -- clear both cookies.</li>
 </ol>
 
-<p id="message" style="color:red;"></p>
+<p id="message"></p>
 
 <script src="/static/app.js"></script>
 </body>
