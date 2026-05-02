@@ -1,3 +1,5 @@
+"""Login use case — validates credentials and issues access + refresh tokens."""
+
 import httpx
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,11 +12,20 @@ from app.contexts.auth.application.dtos.auth_dto import LoginRequestDTO, LoginRe
 from app.shared.utils.security import verify_password, create_access_token, generate_random_token, hash_password
 from app.settings.config import settings
 
+
 class LoginUseCase:
+    """Orchestrates user authentication: credential validation, IAM sync, token issuance."""
+
     def __init__(self, db: AsyncSession):
         self.db = db
 
     async def execute(self, dto: LoginRequestDTO) -> tuple[str, str, LoginResponseDTO]:
+        """Validate credentials and return (access_token, refresh_token, response_dto).
+
+        Raises 401 if credentials are invalid, 403 if the user is inactive.
+        Fetches roles and permissions from dh_iam on success.
+        Creates a new Session record for the refresh token.
+        """
         # 1. Find user
         query = select(AuthUser).where(AuthUser.username == dto.username)
         result = await self.db.execute(query)
@@ -42,7 +53,7 @@ class LoginUseCase:
         # 3. Get Roles and Permissions from dh_iam
         roles = []
         permissions = []
-        
+
         if settings.SERVICE_IAM_URL:
             try:
                 async with httpx.AsyncClient(timeout=2.0) as client:

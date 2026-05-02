@@ -6,32 +6,83 @@
     <title>DH Auth - Test Page</title>
 </head>
 <body>
-    <h1>Digital Hospital - Auth Service</h1>
-    <hr>
 
-    <div id="login-container">
-        <h3>Login</h3>
-        <input type="text" id="username" placeholder="Username / Email / Phone">
-        <br><br>
-        <input type="password" id="password" placeholder="Password">
-        <br><br>
-        <button id="login-btn">Login</button>
-    </div>
+<h1>Digital Hospital -- Auth Service</h1>
+<hr>
 
-    <div id="auth-container" style="display: none;">
-        <h3>Session Active</h3>
-        <p>You are authenticated via HttpOnly cookies.</p>
-        
-        <div id="profile-container" style="background: #f0f0f0; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
-            <h4>Your Profile (/me)</h4>
-            <pre id="profile-data">Loading profile...</pre>
-        </div>
+<div id="login-panel" style="display:block">
 
-        <button id="logout-btn">Logout</button>
-    </div>
+<h2>Login</h2>
+<form id="login-form" onsubmit="return false">
+    <table>
+        <tr>
+            <td><label for="username"><b>Username / Email / Phone:</b></label></td>
+            <td><input type="text" id="username" name="username" placeholder="user@example.com" size="30"></td>
+        </tr>
+        <tr>
+            <td><label for="password"><b>Password:</b></label></td>
+            <td><input type="password" id="password" name="password" placeholder="password" size="30"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><button type="submit" id="login-btn">Login</button></td>
+        </tr>
+    </table>
+</form>
 
-    <p id="message" style="color: red;"></p>
+<p><i>Enter your credentials above to start a session.</i></p>
+</div>
 
-    <script src="/static/app.js"></script>
+<div id="session-panel" style="display:none">
+
+<h2>Session Active</h2>
+
+<table>
+    <tr>
+        <td><b>Status:</b></td>
+        <td><font color="green">Authenticated via HttpOnly cookies</font></td>
+    </tr>
+    <tr>
+        <td><b>Access token:</b></td>
+        <td><tt>HttpOnly, short-lived JWT (15 min)</tt></td>
+    </tr>
+    <tr>
+        <td><b>Refresh token:</b></td>
+        <td><tt>HttpOnly, persistent (30 days)</tt></td>
+    </tr>
+</table>
+
+<h3>Profile (<tt>GET /v1/auth/me</tt>)</h3>
+<pre id="profile-data" style="border:1px solid #ccc; padding:12px; background:#f8f8f8; font-size:13px;">
+Loading profile...
+</pre>
+
+<br>
+<button id="refresh-profile-btn">Refresh Profile</button>
+&nbsp;&nbsp;
+<button id="logout-btn">Logout</button>
+</div>
+
+<br>
+<hr>
+
+<h3>API Reference</h3>
+<ul>
+    <li><a href="/docs" target="_blank">Swagger UI (/docs)</a></li>
+    <li><a href="/redoc" target="_blank">ReDoc (/redoc)</a></li>
+    <li><a href="/openapi.json" target="_blank">openapi.json</a></li>
+</ul>
+
+<h3>Authentication Flow</h3>
+<ol>
+    <li><b>POST /v1/auth/login</b> -- Send credentials, receive HttpOnly cookies.</li>
+    <li><b>GET /v1/auth/me</b> -- Read access_token cookie, return user profile.</li>
+    <li><b>POST /v1/auth/refresh</b> -- Read refresh_token cookie, renew access_token.</li>
+    <li><b>POST /v1/auth/logout</b> -- Clear both cookies.</li>
+</ol>
+
+<p id="message" style="color:red;"></p>
+
+<script src="/static/app.js"></script>
 </body>
 </html>

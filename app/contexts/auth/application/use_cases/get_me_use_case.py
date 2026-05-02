@@ -1,3 +1,5 @@
+"""Get current user profile use case — assembles the full /me response."""
+
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -13,11 +15,20 @@ from app.contexts.auth.application.dtos.auth_dto import (
     MeResponseDTO, EmployeeResponseDTO, CompanyResponseDTO, TenantResponseDTO
 )
 
+
 class GetMeUseCase:
+    """Assembles the full user profile: person info, employee, tenants, roles, permissions."""
+
     def __init__(self, db: AsyncSession):
         self.db = db
 
     async def execute(self, user_uuid: str, roles: list[str] = [], permissions: list[str] = []) -> MeResponseDTO:
+        """Fetch the complete user profile by user UUID.
+
+        Performs a single query with eager-loaded relationships across 4 schemas:
+        auth (AuthUser), people (Person), org (Employee, Company), iam (Membership, Tenant).
+        Raises 404 if the user or associated person record is not found.
+        """
         # Complex query with nested relationships across 4 schemas: auth, people, org, iam
         query = (
             select(AuthUser)
@@ -27,18 +38,18 @@ class GetMeUseCase:
                 selectinload(AuthUser.person).selectinload(Person.memberships).selectinload(Membership.tenant)
             )
         )
-        
+
         result = await self.db.execute(query)
         auth_user = result.scalar_one_or_none()
-        
+
         if not auth_user or not auth_user.person:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="User profile not found"
             )
-        
+
         person = auth_user.person
-        
+
         # Build Employee info if exists
         employee_dto = None
         if person.employees:
@@ -55,7 +66,7 @@ class GetMeUseCase:
                 status=emp.status.value,
                 company=comp_dto
             )
-            
+
         # Build Tenants info
         tenants_list = []
         for m in person.memberships:
@@ -65,7 +76,7 @@ class GetMeUseCase:
                     name=m.tenant.name,
                     key=m.tenant.key
                 ))
-        
+
         return MeResponseDTO(
             uuid=person.uuid,
             first_name=person.first_name,

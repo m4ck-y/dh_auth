@@ -1,3 +1,16 @@
+"""
+Authentication endpoints for the Digital Hospital ecosystem.
+
+Manages login, token refresh, logout, and current user profile retrieval.
+All authentication is handled via HttpOnly cookies (access_token, refresh_token)
+for security — no Authorization headers are used.
+
+## Security
+- Access token: short-lived JWT (default 15 min) stored in HttpOnly cookie.
+- Refresh token: long-lived random token (default 30 days) stored in HttpOnly cookie.
+- Tokens are never exposed to JavaScript (`httponly=True`).
+"""
+
 from fastapi import APIRouter, Depends, Response, Cookie, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional
@@ -13,6 +26,7 @@ from app.settings.config import settings
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 async def get_db():
+    """Yield an async SQLAlchemy session per request."""
     async with AsyncSessionLocal() as session:
         yield session
 
@@ -22,6 +36,16 @@ async def login(
     response: Response, 
     db: AsyncSession = Depends(get_db)
 ):
+    """
+    Authenticate a user and issue access + refresh tokens.
+
+    Validates credentials against AuthUser table, fetches roles/permissions
+    from IAM service, and sets two HttpOnly cookies:
+    - `access_token`: JWT with user claims (15 min default).
+    - `refresh_token`: Random token stored in Session table (30 days default).
+
+    Returns 401 for invalid credentials and 403 for inactive users.
+    """
     use_case = LoginUseCase(db)
     access_token, refresh_token, response_dto = await use_case.execute(request)
 
@@ -52,6 +76,14 @@ async def refresh(
     refresh_token: Optional[str] = Cookie(None),
     db: AsyncSession = Depends(get_db)
 ):
+    """
+    Refresh the access token using a valid refresh token.
+
+    Reads the `refresh_token` cookie, validates it against the Session table,
+    fetches updated roles/permissions from IAM, and issues a new access_token cookie.
+
+    Returns 401 if the refresh token is missing, expired, or invalid.
+    """
     if not refresh_token:
         return Response(status_code=status.HTTP_401_UNAUTHORIZED)
     
@@ -72,6 +104,12 @@ async def refresh(
 
 @router.post("/logout")
 async def logout(response: Response):
+    """
+    Log out the current user by deleting the auth cookies.
+
+    Clears both `access_token` and `refresh_token` cookies from the client.
+    Does not invalidate the server-side session (TTL-based expiration).
+    """
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
     return {"message": "Session closed"}
@@ -81,6 +119,15 @@ async def get_me(
     access_token: Optional[str] = Cookie(None),
     db: AsyncSession = Depends(get_db)
 ):
+    """
+    Get the current authenticated user's profile.
+
+    Reads the `access_token` cookie, decodes the JWT, and fetches the full
+    profile (person info, employee/company, tenants, roles, permissions).
+
+    Returns 401 if the token is missing, expired, or invalid.
+    Returns 404 if the user profile is not found in the database.
+    """
     if not access_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
