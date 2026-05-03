@@ -22,7 +22,7 @@ class GetMeUseCase:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def execute(self, user_uuid: str, roles: list[str] = [], permissions: list[str] = []) -> MeResponseDTO:
+    async def execute(self, uuid_user: str, roles: list[str] = [], permissions: list[str] = []) -> MeResponseDTO:
         """Fetch the complete user profile by user UUID.
 
         Performs a single query with eager-loaded relationships across 4 schemas:
@@ -32,7 +32,7 @@ class GetMeUseCase:
         # Complex query with nested relationships across 4 schemas: auth, people, org, iam
         query = (
             select(AuthUser)
-            .where(AuthUser.uuid == user_uuid)
+            .where(AuthUser.uuid == uuid_user)
             .options(
                 selectinload(AuthUser.person).selectinload(Person.employees).selectinload(Employee.company),
                 selectinload(AuthUser.person).selectinload(Person.memberships).selectinload(Membership.tenant)

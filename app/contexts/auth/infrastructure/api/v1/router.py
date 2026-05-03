@@ -136,7 +136,7 @@ async def get_me(
     
     try:
         payload = decode_access_token(access_token)
-        user_uuid = payload.get("sub")
+        uuid_user = payload.get("sub")
         roles = payload.get("roles", [])
         permissions = payload.get("permissions", [])
     except Exception as e:
@@ -146,4 +146,4 @@ async def get_me(
         )
     
     use_case = GetMeUseCase(db)
-    return await use_case.execute(user_uuid, roles, permissions)
+    return await use_case.execute(uuid_user, roles, permissions)
