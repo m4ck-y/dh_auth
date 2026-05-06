@@ -22,17 +22,11 @@ session management, and current-user profile retrieval.
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
-from dh_shared.base import sync_schemas
-# Import all models to register them in shared_metadata
-from dh_shared.models.auth.user import AuthUser # noqa
-from dh_shared.models.people.person import Person # noqa
-from dh_shared.models.organizations.employee import Employee # noqa
-from dh_shared.models.organizations.company import Company # noqa
-from dh_shared.models.iam.membership import Membership # noqa
-from dh_shared.models.iam.tenant import Tenant # noqa
+from dh_shared.base import init_schemas
 
 from app.settings.config import settings
 from app.shared.database.postgres import engine
@@ -44,7 +38,7 @@ from app.contexts.auth.infrastructure.api.v1.router import router as auth_router
 async def lifespan(app: FastAPI):
     """Sync database schemas and seed default admin user on startup."""
     async with engine.begin() as conn:
-        await sync_schemas(conn, ["auth", "people", "org", "iam"])
+        await init_schemas(conn)
 
     await seed_admin_user()
 
@@ -58,8 +52,16 @@ app = FastAPI(
     description=__doc__,
     version=settings.VERSION,
     lifespan=lifespan,
+    root_path=settings.ROOT_PATH,
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(auth_router, prefix="/v1")
 

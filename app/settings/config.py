@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     VERSION: str = "1.0.0"
     ENVIRONMENT: str = "development"
 
+    # Root path when running standalone (behind gateway path is controlled by gateway)
+    ROOT_PATH: str = "/api/auth"
+    CORS_ORIGINS: list[str] = ["*"]
+
     # PostgreSQL
     POSTGRES_URL: str = "postgresql+asyncpg://user:password@localhost:5432/dh_hospital"
 
