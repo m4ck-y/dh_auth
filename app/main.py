@@ -23,8 +23,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 
 from dh_shared.base import init_schemas
 
@@ -65,13 +65,14 @@ app.add_middleware(
 
 app.include_router(auth_router, prefix="/v1")
 
-# Mount static files for testing UI
+# Mount static files for JS assets
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 @app.get("/", tags=["UI"])
 async def root():
-    """Serve the login test UI page (static/index.html)."""
-    return FileResponse("app/static/index.html")
+    """Serve the retro terminal test UI page."""
+    from app.testui.page import build as build_testui
+    return HTMLResponse(build_testui(settings.ROOT_PATH))
 
 @app.get("/health", tags=["Health"])
 async def health_check():
