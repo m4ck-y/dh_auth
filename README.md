@@ -56,5 +56,53 @@ Copy `.env.example` to `.env`. Required variables:
 | Service | Env Variable | Purpose |
 |---------|-------------|---------|
 | `dh_iam` | `SERVICE_IAM_URL` | Fetching user roles and permissions for JWT payload |
-| `app_logger_tracer` | `SERVICE_LOGGER_TRACER_URL` | VitalTrace observability logging |
+| `dh_logger_tracer` | `SERVICE_LOGGER_TRACER_URL` | VitalTrace observability logging |
 | `dh_shared` | `path = "../dh_shared"` | Shared SQLAlchemy models (AuthUser) |
+
+## Systemd Service Management
+
+### 1. Copiar definición del servicio
+
+```bash
+sudo cp /home/m4ck-y/.me/dh/dh_auth/docs/dh_auth.service /etc/systemd/system/
+```
+
+O crearlo manualmente:
+
+```bash
+sudo nano /etc/systemd/system/dh_auth.service
+```
+
+### 2. Gestionar el servicio
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable dh_auth
+sudo systemctl start dh_auth
+sudo systemctl status dh_auth
+journalctl -u dh_auth -f
+```
+
+## Systemd Service Management
+
+### 1. Copiar definición del servicio
+
+```bash
+sudo cp /home/m4ck-y/.me/dh/dh_auth/docs/dh_auth.service /etc/systemd/system/
+```
+
+O crearlo manualmente:
+
+```bash
+sudo nano /etc/systemd/system/dh_auth.service
+```
+
+### 2. Gestionar el servicio
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable dh_auth
+sudo systemctl start dh_auth
+sudo systemctl status dh_auth
+journalctl -u dh_auth -f
+```
