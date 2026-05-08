@@ -18,7 +18,7 @@ class ELogLevel(str, Enum):
 
 
 async def _push(endpoint: str, payload: dict) -> None:
-    """Fire-and-forget to app_logger_tracer. Never raises — logger failures must not affect the service."""
+    """Fire-and-forget to dh_logger_tracer. Never raises — logger failures must not affect the service."""
     if not settings.SERVICE_LOGGER_TRACER_URL:
         return
     try:

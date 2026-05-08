@@ -78,6 +78,7 @@ class App {
   bindEvents() {
     document.getElementById('login-btn').addEventListener('click', () => this.handleLogin());
     document.getElementById('logout-btn').addEventListener('click', () => this.handleLogout());
+    document.getElementById('refresh-profile-btn').addEventListener('click', () => this.handleRefresh());
   }
 
   async boot() {
@@ -103,6 +104,16 @@ class App {
       }
     } else {
       this.client.setMessage(data.detail || 'Login failed');
+    }
+  }
+
+  async handleRefresh() {
+    const profile = await this.client.me();
+    if (profile) {
+      this.ui.showAuthenticated(profile);
+      this.client.setMessage('Profile refreshed.', 'green');
+    } else {
+      this.client.setMessage('Not authenticated.', 'red');
     }
   }
 
