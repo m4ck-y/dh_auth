@@ -49,14 +49,14 @@ Copy `.env.example` to `.env`. Required variables:
 | `JWT_SECRET_KEY` | `your-secret-here` | Secret key for JWT signing |
 | `JWT_ALGORITHM` | `HS256` | Hashing algorithm for JWT |
 | `SERVICE_IAM_URL` | `http://localhost:8005` | dh_iam base URL (Roles & Permissions) |
-| `SERVICE_LOGGER_TRACER_URL` | `http://localhost:8010` | VitalTrace base URL |
+| `SERVICE_LOGGER_URL` | `http://localhost:8010` | VitalTrace base URL |
 
 ## Dependencies
 
 | Service | Env Variable | Purpose |
 |---------|-------------|---------|
 | `dh_iam` | `SERVICE_IAM_URL` | Fetching user roles and permissions for JWT payload |
-| `dh_logger_tracer` | `SERVICE_LOGGER_TRACER_URL` | VitalTrace observability logging |
+| `dh_logger` | `SERVICE_LOGGER_URL` | VitalTrace observability logging |
 | `dh_shared` | `path = "../dh_shared"` | Shared SQLAlchemy models (AuthUser) |
 
 ## Systemd Service Management

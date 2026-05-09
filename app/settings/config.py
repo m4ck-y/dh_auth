@@ -18,10 +18,10 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = ["*"]
 
     # PostgreSQL
-    POSTGRES_URL: str = "postgresql+asyncpg://user:password@localhost:5432/dh_hospital"
+    POSTGRES_URL: str
 
     # Seguridad / JWT
-    JWT_SECRET_KEY: str = "tu-llave-secreta-aqui"
+    JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
@@ -29,8 +29,7 @@ class Settings(BaseSettings):
     # Service URLs
     SERVICE_CORE_URL: str = ""
     SERVICE_IAM_URL: str = ""
-    SERVICE_LOGGER_TRACER_URL: str = ""
-    SERVICE_MESSAGE_SENDER_URL: str = ""
+    SERVICE_LOGGER_URL: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",
